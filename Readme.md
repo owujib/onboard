@@ -8,7 +8,6 @@ This project provides an Express application with user authentication, Prisma OR
 - [Docker Setup](#docker-setup)
 - [Run the Application Locally](#run-the-application-locally)
 - [API Documentation](#api-documentation)
-- [Folder Structure](#folder-structure)
 
 ## Requirements
 - Node.js (>= 22.x)
@@ -73,7 +72,7 @@ The **API Documentation** section explains how to use the various routes provide
 - **Resend Auth Code** (`/resend-auth-code`): Endpoint to resend auth code.
 - **Get Current User** (`/me`): Endpoint to retrieve the authenticated user's profile.
 you can find the postman json documentation in the folder structure
- 
+
 > please note: to view mails go to the mailhog server running on http://localhost:8025/
 
 
