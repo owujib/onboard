@@ -42,11 +42,7 @@ export const recoverPasswordSchema = Joi.object({
     ,
     authCode: Joi.string()
         .min(1)
-        .required()
-        .messages({
-            "string.empty": "Auth code is required",
-            "any.required": "Auth code is required",
-        }),
+        .required(),
     newPassword: Joi.string()
         .min(6)
         .required()

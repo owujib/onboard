@@ -20,9 +20,7 @@ app.use(
     })
 );
 
-app.set('NODE_ENV', 'development')
-
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 app.all('*', (req, res, next) => {
     return next(new ApiError('Route not found', ResponseUtil.NOT_FOUND))

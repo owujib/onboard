@@ -5,6 +5,7 @@ import prisma from "../../prisma";
 import { forgotPasswordSchema, loginSchema, recoverPasswordSchema, registerSchema, resendAuthCodeSchema } from "../../validation/auth";
 import { comparePassword, generateExpiry, generateToken, hashPassword } from "../../utils/authUtils";
 import { ApiError } from "../../helper/ApiError";
+import { sendEmail } from "../../utils/email";
 
 
 
@@ -19,7 +20,7 @@ class AuthController {
             const user = await prisma.user.create({
                 data: { name: data.name, email: data.email, password: hashedPassword },
             });
-            const { password: _, ...userWithoutPassword } = user;
+            const { password: _, authCode: __, authExpiry: ___, authExpiryMs: ____, ...userWithoutPassword } = user;
             ResponseUtil.sendCreateResponse(res, { user: userWithoutPassword }, "User registered successfully")
             return
         } catch (error) {
@@ -41,33 +42,48 @@ class AuthController {
             next(error)
         }
     }
+
     public async forgotPassword(req: Request, res: Response, next: NextFunction) {
         try {
             const data = validate(forgotPasswordSchema, req.body);
             const user = await prisma.user.findUnique({ where: { email: data.email } });
-            if (!user) return next(ApiError.notFound("User not found"));
+            if (!user) return next(ApiError.badRequest("Something went wrong please check your email and try again"));
 
             const authCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             const authExpiry = generateExpiry();
 
+            console.log({
+                where: { id: user.id },
+                data: {
+                    authCode: authCode,
+                    authExpiry: authExpiry,
+                    authExpiryMs: authExpiry.getTime()
+                },
+            })
+
             await prisma.user.update({
-                where: { email: data.email },
-                data: { authCode, authExpiry },
+                where: { id: user.id },
+                data: {
+                    authCode: authCode,
+                    authExpiry: authExpiry,
+                    authExpiryMs: authExpiry.getTime()
+                },
             });
 
-            // await sendEmail(data.email, "Password Reset Code", `Your code is: ${authCode}`);
+            await sendEmail(data.email, "Password Reset Code", `Your code is: ${authCode}`);
             ResponseUtil.sendSuccessResponse(res, "Password reset code sent")
             return
         } catch (error) {
             return next(error)
         }
     }
+
     public async recoverPassword(req: Request, res: Response, next: NextFunction) {
         try {
             const data = validate(recoverPasswordSchema, req.body);
             const user = await prisma.user.findUnique({ where: { email: data.email } });
 
-            if (!user || user.authCode !== data.authCode || user.authExpiry! < new Date()) {
+            if (!user || user.authCode !== data.authCode || user.authExpiryMs! < new Date().getTime()) {
                 return next(ApiError.badRequest("Invalid or expired code"))
             }
 
@@ -98,14 +114,13 @@ class AuthController {
                 data: { authCode, authExpiry },
             });
 
-            // await sendEmail(data.email, "Verification Code", `Your code is: ${authCode}`);
+            await sendEmail(data.email, "Verification Code", `Your code is: ${authCode}`);
             ResponseUtil.sendSuccessResponse(res, "Verification code resent")
             return
         } catch (error) {
             return next(error)
         }
     }
-
 }
 
 export default new AuthController()

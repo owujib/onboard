@@ -20,7 +20,7 @@ model User {
   password     String
   authCode     String?
   authExpiry   DateTime?
-  authExpiryMs Int?
+  authExpiryMs BigInt?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }

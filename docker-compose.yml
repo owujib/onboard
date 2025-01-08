@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   db:
     image: postgres:13
@@ -9,11 +8,18 @@ services:
     ports:
       - "5432:5432" 
 
-  app:
+  backend:
     build: .
     ports:
-      - "3004:3000"
+      - "3000:3000"
     environment:
       DATABASE_URL: "postgresql://user:password@db:5432/mydb"
     depends_on:
       - db
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
