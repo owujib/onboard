@@ -1,32 +1,8 @@
-import express, { Request, Response } from "express";
-import prisma from "./prisma";
-import morgan from 'morgan'
-import authRoutes from './routes/auth.routes'
-import { ApiError } from "./helper/ApiError";
-import { ResponseUtil } from "./utils/response";
-import { globalErrorHandler } from "./helper/gloabalErrorhandler";
-import { logger } from "./config/logger";
+import app from './app'
+import { logger } from './config/logger';
 
-const app = express();
-const PORT = process.env.PORT || 3004;
+app.set('NODE_ENV', process.env.NODE_ENV || 'development');
 
-app.use(express.json());
-
-app.use(
-    morgan("combined", {
-        stream: {
-            write: (message: any) => logger.info(message.trim()),
-        },
-    })
-);
-
-app.use('/api/auth', authRoutes);
-
-app.all('*', (req, res, next) => {
-    return next(new ApiError('Route not found', ResponseUtil.NOT_FOUND))
-})
-
-app.use(globalErrorHandler);
-app.listen(PORT, () => {
-    logger.info(`Server is running on http://localhost:${PORT}`);
+app.listen(app.get('PORT'), () => {
+    logger.info(`Server is running on http://localhost:${app.get('PORT')}`);
 });

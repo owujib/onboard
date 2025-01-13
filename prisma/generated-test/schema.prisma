@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated-test"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../test.sqlite"
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  name         String
+  email        String      @unique
+  password     String
+  authCode     String?
+  authExpiry   DateTime?
+  authExpiryMs BigInt?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  Inventory    Inventory[]
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  quantity  Int
+  price     Float
+  isPaid    Boolean  @default(false)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

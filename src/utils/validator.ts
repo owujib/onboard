@@ -12,7 +12,6 @@ import { ResponseUtil } from "./response";
 export const validate = (schema: ObjectSchema, payload: any) => {
     const { error, value } = schema.validate(payload, { abortEarly: false });
     if (error) {
-        console.log(error.message)
         throw ApiError.validationError(error.details.map((error) => error.message))
     }
     return value;

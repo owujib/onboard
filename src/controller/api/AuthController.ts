@@ -14,7 +14,7 @@ class AuthController {
         try {
             const data = validate(registerSchema, req.body);
             const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
-            if (existingUser) return next(ApiError.notFound('Email already exists'));
+            if (existingUser) return next(ApiError.badRequest('Email already exists'));
 
             const hashedPassword = await hashPassword(data.password);
             const user = await prisma.user.create({
@@ -52,15 +52,6 @@ class AuthController {
             const authCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             const authExpiry = generateExpiry();
 
-            console.log({
-                where: { id: user.id },
-                data: {
-                    authCode: authCode,
-                    authExpiry: authExpiry,
-                    authExpiryMs: authExpiry.getTime()
-                },
-            })
-
             await prisma.user.update({
                 where: { id: user.id },
                 data: {
@@ -71,7 +62,7 @@ class AuthController {
             });
 
             await sendEmail(data.email, "Password Reset Code", `Your code is: ${authCode}`);
-            ResponseUtil.sendSuccessResponse(res, "Password reset code sent")
+            ResponseUtil.sendSuccessResponse(res, null, "Password reset code sent")
             return
         } catch (error) {
             return next(error)
@@ -93,7 +84,7 @@ class AuthController {
                 data: { password: hashedPassword, authCode: null, authExpiry: null },
             });
 
-            ResponseUtil.sendSuccessResponse(res, "Password reset successfully")
+            ResponseUtil.sendSuccessResponse(res, null, "Password reset successfully")
             return
         } catch (error) {
             return next(error)
@@ -115,7 +106,7 @@ class AuthController {
             });
 
             await sendEmail(data.email, "Verification Code", `Your code is: ${authCode}`);
-            ResponseUtil.sendSuccessResponse(res, "Verification code resent")
+            ResponseUtil.sendSuccessResponse(res, null, "Verification code resent")
             return
         } catch (error) {
             return next(error)

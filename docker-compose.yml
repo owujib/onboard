@@ -14,6 +14,8 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: "postgresql://user:password@db:5432/mydb"
+      NODE_ENV: 'production'
+      PORT: 3000
     depends_on:
       - db
 

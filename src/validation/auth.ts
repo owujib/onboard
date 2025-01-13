@@ -13,7 +13,7 @@ export const registerSchema = Joi.object({
         .min(6)
         .required()
     ,
-}).options({ abortEarly: false })
+})
 
 export const loginSchema = Joi.object({
     email: Joi.string()
@@ -24,7 +24,7 @@ export const loginSchema = Joi.object({
         .min(1)
         .required()
     ,
-}).options({ abortEarly: false })
+})
 
 
 export const forgotPasswordSchema = Joi.object({
@@ -32,7 +32,7 @@ export const forgotPasswordSchema = Joi.object({
         .email({ tlds: { allow: false } })
         .required()
 
-}).options({ abortEarly: false })
+})
 
 
 export const recoverPasswordSchema = Joi.object({
@@ -47,7 +47,7 @@ export const recoverPasswordSchema = Joi.object({
         .min(6)
         .required()
 
-}).options({ abortEarly: false })
+})
 
 
 
@@ -56,5 +56,5 @@ export const resendAuthCodeSchema = Joi.object({
         .email({ tlds: { allow: false } })
         .required()
 
-}).options({ abortEarly: false })
+})
 

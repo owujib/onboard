@@ -11,7 +11,8 @@ export const globalErrorHandler = (
     next: NextFunction
 ) => {
 
-    logger.error({ error: (<any>err).error, stack: err.stack });
+    if (process.env.NODE_ENV !== 'test') logger.error({ error: (<any>err).error, stack: err.stack });
+
     if (err instanceof ApiError) {
         res.status(err.statusCode || ResponseUtil.BAD_REQUEST).json({
             success: false,
